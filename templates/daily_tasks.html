@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <div class="d-flex justify-content-between align-items-center">
+            <h5>Tasks by Date</h5>
+            <form class="d-flex" action="{{ url_for('daily_tasks') }}" method="GET">
+                <input type="date" class="form-control me-2" id="selected_date" name="selected_date" 
+                       value="{{ selected_date }}" required>
+                <button type="submit" class="btn btn-primary">Search</button>
+            </form>
+        </div>
+    </div>
+    <div class="card-body">
+        {% if tasks %}
+            {% for task in tasks %}
+            <div class="card task-card priority-{{ task.priority }} {% if task.is_completed %}completed{% endif %}">
+                <div class="card-body">
+                    <h5 class="card-title">{{ task.name }}</h5>
+                    <h6 class="card-subtitle mb-2 text-muted">Project: {{ task.project.project_number }}</h6>
+                    <p class="card-text">
+                        Estimated Time: {{ task.estimated_time }} hours<br>
+                        Priority: {{ task.priority }}
+                    </p>
+                    <div class="btn-group">
+                        <form action="/task/{{ task.id }}/complete" method="POST" style="display: inline;">
+                            <button type="submit" class="btn btn-success btn-sm">Complete</button>
+                        </form>
+                        <form action="/task/{{ task.id }}/delete" method="POST" style="display: inline;">
+                            <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <p class="text-center">No tasks due on {{ selected_date }}!</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %} 
