@@ -1,121 +1,200 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="row">
-    <div class="col-md-4">
-        <div class="card mb-4">
-            <div class="card-header">
-                <h5>Add New Project</h5>
-            </div>
-            <div class="card-body">
-                <form action="/project/add" method="POST">
-                    <div class="mb-3">
-                        <label for="project_number" class="form-label">Project Number</label>
-                        <input type="text" class="form-control" id="project_number" name="project_number" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="project_info" class="form-label">Project Information (Optional)</label>
-                        <textarea class="form-control" id="project_info" name="project_info" rows="3"></textarea>
-                    </div>
-                    <button type="submit" class="btn btn-primary">Create Project</button>
-                </form>
-            </div>
-        </div>
-
-        <div class="card">
-            <div class="card-header">
-                <h5>Add New Task</h5>
-            </div>
-            <div class="card-body">
-                <form action="/task/add" method="POST">
-                    <div class="mb-3">
-                        <label for="project_id" class="form-label">Project</label>
-                        <select class="form-select" id="project_id" name="project_id" required>
-                            <option value="">Search for a project number...</option>
-                            {% for project in projects %}
-                            <option value="{{ project.id }}">{{ project.project_number }}</option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                    <div class="mb-3">
-                        <label for="name" class="form-label">Task Name</label>
-                        <input type="text" class="form-control" id="name" name="name" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="estimated_time" class="form-label">Estimated Time (hours)</label>
-                        <input type="number" class="form-control" id="estimated_time" name="estimated_time" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="deadline" class="form-label">Deadline</label>
-                        <input type="date" class="form-control" id="deadline" name="deadline" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="priority" class="form-label">Priority (1-5)</label>
-                        <input type="number" class="form-control" id="priority" name="priority" min="1" max="5" value="3" required>
-                    </div>
-                    <button type="submit" class="btn btn-primary">Add Task</button>
-                </form>
+<div class="container-fluid">
+    <!-- 添加鼓励语 -->
+    <div class="row mb-4">
+        <div class="col">
+            <div class="card">
+                <div class="card-body text-center">
+                    <p class="h3 text-primary mb-0" style="font-family: 'Helvetica Neue', sans-serif;">
+                        □ {{ current_user.name }}, You can do anything!✨🐶✅ □
+                    </p>
+                </div>
             </div>
         </div>
     </div>
 
-    <div class="col-md-8">
-        <!-- 未完成任务 -->
-        <div class="card mb-4">
-            <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
-                <h5 class="mb-0">Uncompleted Tasks</h5>
-                <span class="badge bg-light text-dark">{{ uncompleted_tasks|length }}</span>
+    <div class="row">
+        <!-- 左侧栏 - 表单 -->
+        <div class="col-md-4">
+            <!-- Add New Project 表单 -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h3>Add New Project</h3>
+                </div>
+                <div class="card-body">
+                    <form action="{{ url_for('add_project') }}" method="POST">
+                        <div class="form-group mb-3">
+                            <label for="project_number">Project Number</label>
+                            <input type="text" class="form-control" id="project_number" name="project_number" required>
+                        </div>
+                        <div class="form-group mb-3">
+                            <label for="project_info">Project Information (Optional)</label>
+                            <textarea class="form-control" id="project_info" name="project_info" rows="3"></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Create Project</button>
+                    </form>
+                </div>
             </div>
-            <div class="card-body">
-                {% for task in uncompleted_tasks %}
-                <div class="card task-card priority-{{ task.priority }} mb-2">
-                    <div class="card-body">
-                        <h5 class="card-title">{{ task.name }}</h5>
-                        <h6 class="card-subtitle mb-2 text-muted">Project: {{ task.project.project_number }}</h6>
-                        <p class="card-text">
-                            Estimated Time: {{ task.estimated_time }} hours<br>
-                            Deadline: {{ task.deadline.strftime('%Y-%m-%d') }}<br>
-                            Priority: {{ task.priority }}
-                        </p>
+
+            <!-- Add New Task 表单 -->
+            <div class="card">
+                <div class="card-header">
+                    <h3>Add New Task</h3>
+                </div>
+                <div class="card-body">
+                    <form action="{{ url_for('add_task') }}" method="POST">
+                        <div class="form-group mb-3">
+                            <label for="project_id">Project</label>
+                            <select class="form-control" id="project_id" name="project_id" required>
+                                {% for project in projects %}
+                                <option value="{{ project.id }}">{{ project.project_number }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="form-group mb-3">
+                            <label for="name">Task Name</label>
+                            <input type="text" class="form-control" id="name" name="name" required>
+                        </div>
+                        <div class="form-group mb-3">
+                            <label for="estimated_time">Estimated Time (hours)</label>
+                            <input type="number" class="form-control" id="estimated_time" name="estimated_time" required>
+                        </div>
+                        <div class="form-group mb-3">
+                            <label for="deadline">Deadline</label>
+                            <input type="date" class="form-control" id="deadline" name="deadline" required>
+                        </div>
+                        <div class="form-group mb-3">
+                            <label for="priority">Priority (0-5, 0 being most urgent)</label>
+                            <input type="number" class="form-control" id="priority" name="priority" min="0" max="5" value="3" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Add Task</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- 右侧栏 - 任务列表 -->
+        <div class="col-md-8">
+            <!-- Uncompleted Tasks -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <h3>Uncompleted Tasks</h3>
+                        <span class="badge bg-primary">{{ uncompleted_tasks|length }}</span>
+                    </div>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="bi bi-search"></i></span>
+                        <input type="text" class="form-control" id="uncompleted-search" placeholder="Search by project number...">
+                    </div>
+                </div>
+                <div class="card-body">
+                    {% for task in uncompleted_tasks %}
+                    <div class="task-card mb-3 p-3 rounded" data-project="{{ task.project.project_number }}" style="background-color: {% if task.priority == 0 %}#ffebee{% elif task.priority == 1 %}#fff3e0{% elif task.priority == 2 %}#fffde7{% else %}#f1f8e9{% endif %}">
+                        <h5>{{ task.name }}</h5>
+                        <p class="mb-1">Project: {{ task.project.project_number }}</p>
+                        <p class="mb-1">Estimated Time: {{ task.estimated_time }} hours</p>
+                        <p class="mb-1">Deadline: {{ task.deadline.strftime('%Y-%m-%d') }}</p>
+                        <p class="mb-2">Priority: {{ task.priority }}</p>
                         <div class="btn-group">
-                            <form action="/task/{{ task.id }}/complete" method="POST" style="display: inline;">
+                            <form action="{{ url_for('complete_task', task_id=task.id) }}" method="POST" class="me-2">
                                 <button type="submit" class="btn btn-success btn-sm">Complete</button>
                             </form>
-                            <form action="/task/{{ task.id }}/delete" method="POST" style="display: inline;">
+                            <form action="{{ url_for('delete_task', task_id=task.id) }}" method="POST">
                                 <button type="submit" class="btn btn-danger btn-sm">Delete</button>
                             </form>
                         </div>
                     </div>
+                    {% endfor %}
                 </div>
-                {% endfor %}
             </div>
-        </div>
 
-        <!-- 已完成任务 -->
-        <div class="card">
-            <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
-                <h5 class="mb-0">Completed Tasks</h5>
-                <span class="badge bg-light text-dark">{{ completed_tasks|length }}</span>
-            </div>
-            <div class="card-body">
-                {% for task in completed_tasks %}
-                <div class="card task-card completed mb-2">
-                    <div class="card-body">
-                        <h5 class="card-title">{{ task.name }}</h5>
-                        <h6 class="card-subtitle mb-2 text-muted">Project: {{ task.project.project_number }}</h6>
-                        <p class="card-text">
-                            Estimated Time: {{ task.estimated_time }} hours<br>
-                            Deadline: {{ task.deadline.strftime('%Y-%m-%d') }}<br>
-                            Priority: {{ task.priority }}
-                        </p>
-                        <form action="/task/{{ task.id }}/delete" method="POST" style="display: inline;">
-                            <button type="submit" class="btn btn-danger btn-sm">Delete</button>
-                        </form>
+            <!-- Completed Tasks -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <h3>Completed Tasks</h3>
+                    </div>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="bi bi-search"></i></span>
+                        <input type="text" class="form-control" id="completed-search" placeholder="Search by project number...">
                     </div>
                 </div>
-                {% endfor %}
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Task Name</th>
+                                    <th>Project</th>
+                                    <th>Completed Date</th>
+                                    <th>Deadline</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for task in completed_tasks %}
+                                <tr data-project="{{ task.project.project_number }}">
+                                    <td>{{ task.name }}</td>
+                                    <td>{{ task.project.project_number }}</td>
+                                    <td>{{ task.deadline.strftime('%Y-%m-%d') }}</td>
+                                    <td>{{ task.deadline.strftime('%Y-%m-%d') }}</td>
+                                    <td>
+                                        <div class="btn-group">
+                                            <form action="{{ url_for('restore_task', task_id=task.id) }}" method="POST" class="me-2">
+                                                <button type="submit" class="btn btn-warning btn-sm">Restore</button>
+                                            </form>
+                                            <form action="{{ url_for('delete_task', task_id=task.id) }}" method="POST">
+                                                <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 </div>
+
+<!-- 添加搜索功能的 JavaScript -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // 未完成任务搜索
+    const uncompletedSearch = document.getElementById('uncompleted-search');
+    uncompletedSearch.addEventListener('input', function(e) {
+        const searchValue = e.target.value.toLowerCase();
+        const taskCards = document.querySelectorAll('.task-card');
+        
+        taskCards.forEach(card => {
+            const projectNumber = card.getAttribute('data-project').toLowerCase();
+            if (projectNumber.includes(searchValue)) {
+                card.style.display = '';
+            } else {
+                card.style.display = 'none';
+            }
+        });
+    });
+
+    // 已完成任务搜索
+    const completedSearch = document.getElementById('completed-search');
+    completedSearch.addEventListener('input', function(e) {
+        const searchValue = e.target.value.toLowerCase();
+        const taskRows = document.querySelectorAll('tbody tr');
+        
+        taskRows.forEach(row => {
+            const projectNumber = row.getAttribute('data-project').toLowerCase();
+            if (projectNumber.includes(searchValue)) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+    });
+});
+</script>
 {% endblock %} 
