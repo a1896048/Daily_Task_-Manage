@@ -18,7 +18,9 @@
             <div class="card task-card priority-{{ task.priority }} {% if task.is_completed %}completed{% endif %}">
                 <div class="card-body">
                     <h5 class="card-title">{{ task.name }}</h5>
-                    <h6 class="card-subtitle mb-2 text-muted">Project: {{ task.project.project_number }}</h6>
+                    <h6 class="card-subtitle mb-2 text-muted">
+                        Project: {% if task and task.project %}{{ task.project.project_number }}{% else %}(Not Found){% endif %}
+                    </h6>
                     <p class="card-text">
                         Estimated Time: {{ task.estimated_time }} hours<br>
                         Priority: {{ task.priority }}

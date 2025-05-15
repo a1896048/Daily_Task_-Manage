@@ -1,6 +1,12 @@
 Flask==3.0.2
 Flask-SQLAlchemy==3.1.1
-Flask-Login==0.7.0
-Werkzeug==3.0.0
+Flask-Login==0.6.3
+oauthlib==3.2.2
+requests==2.31.0
+Werkzeug==3.0.1
 python-dotenv==1.0.1
-SQLAlchemy==2.0.28 
+SQLAlchemy==1.4.49
+certifi==2025.4.26
+charset-normalizer==3.4.1
+idna==3.10
+urllib3==2.4.0 
