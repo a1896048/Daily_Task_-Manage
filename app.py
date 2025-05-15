@@ -9,9 +9,7 @@ import json
 from werkzeug.security import generate_password_hash, check_password_hash
 
 app = Flask(__name__)
-
-# 配置密钥
-app.secret_key = os.urandom(24)
+app.secret_key = 'your-very-secret-key-123456'  # 固定字符串
 
 # Google OAuth 配置
 GOOGLE_CLIENT_ID = "your-google-client-id"
